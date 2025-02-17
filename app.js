@@ -71,14 +71,21 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     }
 
     const html = fs.readFileSync(file.path, "utf-8");
-    const browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({
+      headless: true, // or "new" depending on your version
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true, // Включаем фоновые стили
+      displayHeaderFooter: false,
+      preferCSSPageSize: true
     });
+
 
     await browser.close();
     fs.unlinkSync(file.path);
@@ -135,15 +142,157 @@ app.post("/convert/base64", upload.single("file"), async (req, res) => {
     }
 
     const html = fs.readFileSync(file.path, "utf-8");
-    const browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({
+      headless: true, // or "new" depending on your version
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "A4" });
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true, // Включаем фоновые стили
+      displayHeaderFooter: false,
+      preferCSSPageSize: true
+    });
+
     await browser.close();
     fs.unlinkSync(file.path);
 
     const base64 = uint8ArrayToBase64(pdfBuffer);
     res.json({ base64 });
+  } catch (error) {
+    console.error("Ошибка:", error);
+    res.status(500).json({ error: "Ошибка обработки" });
+  }
+});
+// New endpoint for converting HTML string to PDF and returning Base64
+/**
+ * @swagger
+ * /convert/html/base64:
+ *   post:
+ *     summary: Конвертирует HTML строку в PDF и возвращает Base64
+ *     description: Принимает строку HTML и возвращает PDF в формате Base64.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               html:
+ *                 type: string
+ *                 description: HTML-строка для конвертации
+ *     responses:
+ *       200:
+ *         description: Успешное создание PDF в формате Base64
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 base64:
+ *                   type: string
+ *                   description: PDF в Base64
+ *       400:
+ *         description: Ошибка, HTML не передан
+ *       500:
+ *         description: Ошибка сервера
+ */
+app.post("/convert/html/base64", async (req, res) => {
+  try {
+    const html = req.body.html;
+    if (!html) {
+      return res.status(400).json({ error: "HTML не передан" });
+    }
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true, // Включаем фоновые стили
+      displayHeaderFooter: false,
+      preferCSSPageSize: true
+    });
+
+    await browser.close();
+
+    const base64 = uint8ArrayToBase64(pdfBuffer);
+    res.json({ base64 });
+  } catch (error) {
+    console.error("Ошибка:", error);
+    res.status(500).json({ error: "Ошибка обработки" });
+  }
+});
+
+// New endpoint for converting HTML string to PDF and returning it as a file
+/**
+ * @swagger
+ * /convert/html/file:
+ *   post:
+ *     summary: Конвертирует HTML строку в PDF и возвращает файл
+ *     description: Принимает строку HTML и возвращает PDF файл.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               html:
+ *                 type: string
+ *                 description: HTML-строка для конвертации
+ *               filename:
+ *                 type: string
+ *                 description: Название выходного PDF (например, output.pdf)
+ *     responses:
+ *       200:
+ *         description: PDF-файл успешно создан и отправлен
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Ошибка, HTML не передан
+ *       500:
+ *         description: Ошибка сервера
+ */
+app.post("/convert/html/file", async (req, res) => {
+  try {
+    const html = req.body.html;
+    const pdfName = req.body.filename || "output.pdf";
+
+    if (!html) {
+      return res.status(400).json({ error: "HTML не передан" });
+    }
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true, // Включаем фоновые стили
+      displayHeaderFooter: false,
+      preferCSSPageSize: true
+    });
+
+    await browser.close();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${pdfName}"`);
+    res.setHeader("Content-Length", pdfBuffer.length); // Указываем размер файла
+
+    res.end(pdfBuffer); // Отправляем файл
   } catch (error) {
     console.error("Ошибка:", error);
     res.status(500).json({ error: "Ошибка обработки" });
