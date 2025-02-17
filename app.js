@@ -20,7 +20,7 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "API для конвертации HTML-файлов в PDF",
     },
-    servers: [{ url: "http://localhost:3000" }],
+    servers: [{ url: "https://pdf-converter-0ayf.onrender.com" }],
   },
   apis: ["./app.js"],
 };
