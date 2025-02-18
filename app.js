@@ -20,14 +20,15 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "API для конвертации HTML-файлов в PDF",
     },
-    servers: [{ url: "http://85.202.192.87:3000/" }],
+    servers: [{ url: "http://localhost:3000/" }],
   },
   apis: ["./app.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 /**
  * @swagger
  * /convert:
@@ -201,7 +202,7 @@ app.post("/convert/base64", upload.single("file"), async (req, res) => {
  */
 app.post("/convert/html/base64", async (req, res) => {
   try {
-    const html = req.body.html;
+    const html = req.body.htmlContent;
     if (!html) {
       return res.status(400).json({ error: "HTML не передан" });
     }
