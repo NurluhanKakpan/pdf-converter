@@ -20,15 +20,17 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "API для конвертации HTML-файлов в PDF",
     },
-    servers: [{ url: "http://85.202.192.87:3000/" }],
+    servers: [{ url: "http://localhost:3000/" }],
   },
   apis: ["./app.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({
+  limit: '5gb'
+}));
+app.use(express.urlencoded({ limit: '5gb', extended: true }));
 /**
  * @swagger
  * /convert:
@@ -214,16 +216,19 @@ app.post("/convert/html/base64", async (req, res) => {
 
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
+
     const pdfBuffer = await page.pdf({
       format: "A4",
-      printBackground: true, // Включаем фоновые стили
+      printBackground: true,
       displayHeaderFooter: false,
       preferCSSPageSize: true
     });
 
     await browser.close();
 
-    const base64 = uint8ArrayToBase64(pdfBuffer);
+    // Исправление: Используем Buffer напрямую
+    const base64 = pdfBuffer.toString("base64");
+
     res.json({ base64 });
   } catch (error) {
     console.error("Ошибка:", error);
