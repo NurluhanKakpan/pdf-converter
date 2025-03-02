@@ -2,7 +2,6 @@ const express = require("express");
 const multer = require("multer");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const path = require("path");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
@@ -204,6 +203,9 @@ app.post("/convert/base64", upload.single("file"), async (req, res) => {
  */
 app.post("/convert/html/base64", async (req, res) => {
   try {
+
+    console.log('Start convert html to pdf');
+
     const html = req.body.htmlContent;
     if (!html) {
       return res.status(400).json({ error: "HTML не передан" });
@@ -313,4 +315,5 @@ function uint8ArrayToBase64(uint8Array) {
 app.listen(port, () => {
   console.log(`🚀 Сервер запущен на http://localhost:${port}`);
   console.log(`📄 Swagger доступен на http://localhost:${port}/api-docs`);
+  console.log(`📂 Загрузки доступны в папке uploads`);
 });
