@@ -11,12 +11,12 @@ RUN apt-get update && apt-get install -y \
     fonts-dejavu fonts-noto fonts-freefont-ttf \
     && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем Times New Roman вручную
-RUN mkdir -p /usr/share/fonts/truetype/msttcore/ && \
-    wget -qO /usr/share/fonts/truetype/msttcore/times.ttf https://github.com/martinring/clide/raw/master/fonts/times.ttf && \
+# Загружаем шрифты Noto Serif (поддерживает казахский)
+RUN mkdir -p /usr/share/fonts/truetype/noto && \
+    wget -qO /usr/share/fonts/truetype/noto/NotoSerif-Regular.ttf https://github.com/notofonts/noto-serif/raw/main/NotoSerif-Regular.ttf && \
     fc-cache -fv
 
-# Устанавливаем шрифты Roboto
+# Загружаем шрифты Roboto
 RUN mkdir -p /usr/share/fonts/truetype/roboto && \
     wget -qO /usr/share/fonts/truetype/roboto/Roboto-Regular.ttf https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Regular.ttf && \
     fc-cache -fv
