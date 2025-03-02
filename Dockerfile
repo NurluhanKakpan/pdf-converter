@@ -9,13 +9,16 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 libgbm1 libgtk-3-0 libnss3 lsb-release \
     libappindicator3-1 libxshmfence1 libpangocairo-1.0-0 \
     fonts-dejavu fonts-noto fonts-freefont-ttf \
-    ttf-mscorefonts-installer \
-    && fc-cache -fv \
     && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем Times New Roman вручную
+RUN mkdir -p /usr/share/fonts/truetype/msttcore/ && \
+    wget -qO /usr/share/fonts/truetype/msttcore/times.ttf https://github.com/martinring/clide/raw/master/fonts/times.ttf && \
+    fc-cache -fv
 
 # Устанавливаем шрифты Roboto
 RUN mkdir -p /usr/share/fonts/truetype/roboto && \
-    wget -qO- https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Regular.ttf > /usr/share/fonts/truetype/roboto/Roboto-Regular.ttf && \
+    wget -qO /usr/share/fonts/truetype/roboto/Roboto-Regular.ttf https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Regular.ttf && \
     fc-cache -fv
 
 WORKDIR /app
