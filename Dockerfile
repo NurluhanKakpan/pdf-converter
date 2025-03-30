@@ -41,6 +41,6 @@ RUN apt-get update && apt-get install -y \
 COPY . .
 RUN mkdir -p uploads && chmod 777 uploads
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/lib/chromium-browser/chrome
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 EXPOSE 3001
 CMD ["node", "app.js"]
