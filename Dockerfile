@@ -12,14 +12,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Загружаем шрифты Noto Serif (поддерживает казахский)
-RUN mkdir -p /usr/share/fonts/truetype/noto && \
-    wget -qO /usr/share/fonts/truetype/noto/NotoSerif-Regular.ttf https://github.com/notofonts/noto-serif/raw/main/NotoSerif-Regular.ttf && \
-    fc-cache -fv
-
-# Загружаем шрифты Roboto
-RUN mkdir -p /usr/share/fonts/truetype/roboto && \
-    wget -qO /usr/share/fonts/truetype/roboto/Roboto-Regular.ttf https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Regular.ttf && \
-    fc-cache -fv
 
 WORKDIR /app
 
