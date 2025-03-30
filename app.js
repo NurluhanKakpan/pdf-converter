@@ -6,7 +6,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Настройка загрузки файлов
 const upload = multer({ dest: "uploads/" });
@@ -19,7 +19,7 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "API для конвертации HTML-файлов в PDF",
     },
-    servers: [{ url: "http://85.202.192.87:3000/" }],
+    servers: [{ url: "http://85.202.192.76:3001/" }],
   },
   apis: ["./app.js"],
 };
